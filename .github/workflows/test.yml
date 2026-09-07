@@ -17,7 +17,7 @@ jobs:
           python-version: "3.12"
       - name: Run Python tests
         run: python -m unittest discover -s tests -v
-      - name: Validate Windows installer and launcher
+      - name: Validate Windows installer syntax
         if: runner.os == 'Windows'
         shell: powershell
         run: |
@@ -25,5 +25,10 @@ jobs:
           $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path install.ps1), [ref]$tokens, [ref]$errors) | Out-Null
           if ($errors.Count) { $errors | Format-List; exit 1 }
+      - name: Compile Windows launcher
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
           $framework = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319"
+          Get-ChildItem -LiteralPath $framework -Filter 'System.Web.Extensions.dll'
           & "$framework\csc.exe" /nologo /target:exe /out:windows-host.exe "/reference:$framework\System.Web.Extensions.dll" native/windows_launcher.cs
