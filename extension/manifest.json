@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Clash 网站规则",
+  "version": "1.0.0",
+  "description": "将当前网站加入 Clash 直连或代理规则，自动备份并立即生效。",
+  "permissions": [
+    "activeTab",
+    "nativeMessaging"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "添加网站至 Clash 规则"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwmM5gm+O0gDbOLoxTwSJpI0Na9a7wnG8x9LTXohkWuGo8J5yNtf+B2znndMTNkeNlr6SGw5zRSXU72iuJBz9YNTFIgPEz1xECnEaFVHDvt/vo0mIAm/GePSPwPzVvajVyou9qXCrMbswdmmFXr1IxVoKrq9OW6nC5pjuKOb3fL64SiqH6nz+y6TNNoKAVDnXK1/OvMWa5AO3DG+RCJGAkQ1kozDAp0jPfPmNYxQLW5mz1KgY5lAWa7MkvBYgjZg31sSGaPA8OHsOmVDZfySCZwmOfJ2wHklj1fR6NKF57SLs9E8xx4vnBa20UphwzQqhjfQVhB4frAHARPK7C8gwZwIDAQAB"
+}

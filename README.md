@@ -1,0 +1,45 @@
+# Clash 网站规则（macOS / ClashX Pro）
+
+点击 Chrome 工具栏扩展，将当前网站添加为直连、阻止或已有代理组规则。配置始终跟随 ClashX Pro 当前选择的配置，控制器为 `127.0.0.1:9090`。
+
+## 安装
+
+1. 双击 `install.command` 安装本地辅助程序（需要 Python 3，仅使用标准库，无需 pip）。
+2. Chrome 打开 `chrome://extensions`，开启右上角「开发者模式」。
+3. 点击「加载已解压的扩展程序」，选择本项目的 `extension` 文件夹。
+4. 在工具栏拼图菜单中固定「Clash 网站规则」。
+
+扩展有固定公钥，路径变动不会改变 ID。项目文件夹需保留，辅助程序已经复制到用户 Library。安装不修改浏览器偏好文件。
+
+## 使用
+
+打开网站 → 点击扩展 → 检查域名和匹配范围 → 选择访问方式 → 添加并立即生效。
+
+例如在 `www.cc98.org` 页面，将域名改成 `cc98.org`，选「该域名及全部子域名」和「直连」，即可同时覆盖首页、API 等子域名。默认保留当前完整域名，避免错误推断主域名。
+
+- 同一域名、同一匹配类型再次添加会更新其策略，并置于规则最前面。
+- 删除只移除扩展管理的规则，原配置中已有规则保持不变。
+- 所有扩展规则保存在独立文件；订阅更新后点击「重新应用」。本版本不在后台监视订阅。
+- 自定义规则集合全局共享，重新应用会写入当前选择的配置；若其中有不存在的代理组会报错。
+- Clash 必须处于规则模式。网页可能需要刷新；已建立的连接不会被强行断开。
+- 仅支持包含小写 `rules:` 常规列表的 Clash YAML；不支持内联列表、别名、IP 地址输入。
+
+## 数据与恢复
+
+本地程序：`~/Library/Application Support/ClashSiteRule/`
+
+- `rules.json`：扩展保存的规则。
+- `backups/`：每次应用前的完整配置备份（可能含订阅凭据，请勿公开）。
+- `settings.json`：若 Clash 配置了 API secret，可在 `secret` 字段填写。
+
+配置原文只插入一个带标记的规则块，其他内容不重新格式化。应用后会检查运行时规则；重载失败会还原文件并尝试重新加载原配置。原配置已有相同规则时，不会擅自移除它。
+
+卸载：先在扩展中删除其保存的规则，然后从 Chrome 移除扩展；删除上述辅助程序目录及 `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/local.clash_site_rule.json`。
+
+## 开发验证
+
+```sh
+python3 -m unittest discover -s tests -v
+```
+
+权限仅 `activeTab` 和 `nativeMessaging`；不读取网页正文、浏览历史或登录信息，不运行网页脚本，不开放网络监听端口。桥接采用 [Chrome 官方 Native Messaging 协议](https://developer.chrome.com/docs/extensions/develop/concepts/native-messaging)，只接受本扩展来源。
