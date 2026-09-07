@@ -9,7 +9,7 @@ spec = importlib.util.spec_from_file_location('host', Path(__file__).parents[1] 
 host = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(host)
 
-SOURCE = 'proxies:\n  - {name: private, password: unchanged}\nrules:\n - DOMAIN-SUFFIX,cc98.org,DIRECT\n - MATCH,Proxy\n'
+SOURCE = 'proxies:\n  - {name: private, password: unchanged}\nrules:\n - DOMAIN-SUFFIX,existing.test,DIRECT\n - MATCH,Proxy\n'
 RULE = {'domain': 'example.org', 'type': 'DOMAIN-SUFFIX', 'policy': 'DIRECT'}
 
 
@@ -22,7 +22,7 @@ class Tests(unittest.TestCase):
 
     def test_roundtrip_preserves_original(self):
         rendered = host.render(SOURCE, [RULE])
-        self.assertLess(rendered.index('example.org'), rendered.index('cc98.org'))
+        self.assertLess(rendered.index('example.org'), rendered.index('existing.test'))
         self.assertEqual(host.render(rendered, []), SOURCE)
         self.assertEqual(host.render(rendered, [RULE]), rendered)
 
@@ -34,7 +34,7 @@ class Tests(unittest.TestCase):
 
     def test_rule_signatures(self):
         self.assertEqual(host.Bridge.rule_signatures(SOURCE), {
-            ('DOMAIN-SUFFIX', 'cc98.org', 'DIRECT')
+            ('DOMAIN-SUFFIX', 'existing.test', 'DIRECT')
         })
 
     def test_windows_profile_matches_live_rules(self):
