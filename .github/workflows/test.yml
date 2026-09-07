@@ -11,8 +11,8 @@ jobs:
         os: [macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Run Python tests
@@ -25,4 +25,5 @@ jobs:
           $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path install.ps1), [ref]$tokens, [ref]$errors) | Out-Null
           if ($errors.Count) { $errors | Format-List; exit 1 }
-          & "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe" /nologo /target:exe /out:windows-host.exe /reference:System.Web.Extensions.dll native/windows_launcher.cs
+          $framework = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319"
+          & "$framework\csc.exe" /nologo /target:exe /out:windows-host.exe "/reference:$framework\System.Web.Extensions.dll" native/windows_launcher.cs

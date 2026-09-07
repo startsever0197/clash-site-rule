@@ -29,7 +29,10 @@ $cscCandidates = @(
 )
 $csc = $cscCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 if (-not $csc) { throw '.NET Framework C# compiler not found.' }
-& $csc /nologo /target:exe "/out:$root\host.exe" /reference:System.Web.Extensions.dll (Join-Path $project 'native\windows_launcher.cs')
+$framework = Split-Path -Parent $csc
+$webExtensions = Join-Path $framework 'System.Web.Extensions.dll'
+if (-not (Test-Path -LiteralPath $webExtensions)) { throw 'System.Web.Extensions.dll not found.' }
+& $csc /nologo /target:exe "/out:$root\host.exe" "/reference:$webExtensions" (Join-Path $project 'native\windows_launcher.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Failed to compile the native messaging launcher.' }
 
 $settingsPath = Join-Path $root 'settings.json'
