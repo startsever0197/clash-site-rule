@@ -7,6 +7,9 @@ import shlex
 import shutil
 import sys
 
+if sys.platform == 'win32':
+    raise SystemExit('Windows 请双击 install.cmd 安装。')
+
 PROJECT = Path(__file__).resolve().parent
 ROOT = Path.home() / 'Library/Application Support/ClashSiteRule'
 ROOT.mkdir(parents=True, exist_ok=True)

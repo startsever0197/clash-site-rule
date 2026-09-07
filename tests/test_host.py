@@ -26,6 +26,39 @@ class Tests(unittest.TestCase):
         self.assertEqual(host.render(rendered, []), SOURCE)
         self.assertEqual(host.render(rendered, [RULE]), rendered)
 
+    def test_crlf_roundtrip(self):
+        source = SOURCE.replace('\n', '\r\n')
+        rendered = host.render(source, [RULE])
+        self.assertNotIn('\n', rendered.replace('\r\n', ''))
+        self.assertEqual(host.render(rendered, []), source)
+
+    def test_rule_signatures(self):
+        self.assertEqual(host.Bridge.rule_signatures(SOURCE), {
+            ('DOMAIN-SUFFIX', 'cc98.org', 'DIRECT')
+        })
+
+    def test_windows_profile_matches_live_rules(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); clash = root / 'clash'; profiles = clash / 'profiles'
+            profiles.mkdir(parents=True)
+            (root / 'settings.json').write_text(json.dumps({'clash_home': str(clash)}))
+            (profiles / 'old.yml').write_text('rules:\n - DOMAIN,a.example,DIRECT\n - DOMAIN,b.example,DIRECT\n')
+            current = profiles / 'current.yml'
+            current.write_text('rules:\n - DOMAIN,a.example,Proxy\n - DOMAIN,b.example,Proxy\n')
+            bridge = host.Bridge(root)
+            live = {'rules': [
+                {'type': 'Domain', 'payload': 'a.example', 'proxy': 'Proxy'},
+                {'type': 'Domain', 'payload': 'b.example', 'proxy': 'Proxy'}]}
+            with patch.object(bridge, 'api', return_value=live):
+                self.assertEqual(bridge.windows_profile(), current)
+
+    def test_controller_discovery(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); clash = root / 'clash'; clash.mkdir()
+            (root / 'settings.json').write_text(json.dumps({'clash_home': str(clash)}))
+            (clash / 'config.yaml').write_text('external-controller: 0.0.0.0:58321\n')
+            self.assertEqual(host.Bridge(root).controller(), 'http://127.0.0.1:58321')
+
     def test_unicode_policy_is_quoted(self):
         output = host.render(SOURCE, [dict(RULE, policy='🇨🇳 国内网站')])
         self.assertIn('"DOMAIN-SUFFIX,example.org,🇨🇳 国内网站"', output)

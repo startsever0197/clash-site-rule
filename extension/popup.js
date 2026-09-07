@@ -70,7 +70,7 @@ async function init() {
     show(await native({ action: 'status' }));
   } catch (error) {
     $('connection').textContent = '连接失败';
-    message(`${error.message}。请确认 ClashX Pro 已启动，并已运行 install.command。`, true);
+    message(`${error.message}。请确认 Clash 已启动，并已运行对应系统的安装程序。`, true);
   } finally { busy(false); preview(); }
 }
 init();
