@@ -30,5 +30,4 @@ jobs:
         shell: powershell
         run: |
           $framework = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319"
-          Get-ChildItem -LiteralPath $framework -Filter 'System.Web.Extensions.dll'
-          & "$framework\csc.exe" /nologo /target:exe /out:windows-host.exe "/reference:$framework\System.Web.Extensions.dll" native/windows_launcher.cs
+          & "$framework\csc.exe" /nologo /target:exe /out:windows-host.exe native/windows_launcher.cs

@@ -1,19 +1,16 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Web.Script.Serialization;
-
-public class LauncherConfig { public string python; public string script; }
 
 public class Program {
     public static int Main(string[] args) {
         try {
             string directory = AppDomain.CurrentDomain.BaseDirectory;
-            string raw = File.ReadAllText(Path.Combine(directory, "launcher.json"));
-            LauncherConfig config = new JavaScriptSerializer().Deserialize<LauncherConfig>(raw);
+            string[] config = File.ReadAllLines(Path.Combine(directory, "launcher.txt"));
+            if (config.Length != 2) throw new InvalidDataException("Invalid launcher configuration.");
             ProcessStartInfo info = new ProcessStartInfo();
-            info.FileName = config.python;
-            info.Arguments = Quote(config.script) + " " + JoinArguments(args);
+            info.FileName = config[0];
+            info.Arguments = Quote(config[1]) + " " + JoinArguments(args);
             info.UseShellExecute = false;
             info.CreateNoWindow = true;
             info.RedirectStandardInput = true;

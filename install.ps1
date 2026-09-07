@@ -21,7 +21,7 @@ if (-not $python -or -not (Test-Path -LiteralPath $python)) {
 $root = Join-Path $env:LOCALAPPDATA 'ClashSiteRule'
 New-Item -ItemType Directory -Force -Path $root | Out-Null
 Copy-Item -LiteralPath (Join-Path $project 'native\host.py') -Destination (Join-Path $root 'host.py') -Force
-Write-Utf8NoBom (Join-Path $root 'launcher.json') (@{ python = $python; script = (Join-Path $root 'host.py') } | ConvertTo-Json)
+Write-Utf8NoBom (Join-Path $root 'launcher.txt') ($python + [Environment]::NewLine + (Join-Path $root 'host.py'))
 
 $cscCandidates = @(
   "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe",
@@ -29,10 +29,7 @@ $cscCandidates = @(
 )
 $csc = $cscCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 if (-not $csc) { throw '.NET Framework C# compiler not found.' }
-$framework = Split-Path -Parent $csc
-$webExtensions = Join-Path $framework 'System.Web.Extensions.dll'
-if (-not (Test-Path -LiteralPath $webExtensions)) { throw 'System.Web.Extensions.dll not found.' }
-& $csc /nologo /target:exe "/out:$root\host.exe" "/reference:$webExtensions" (Join-Path $project 'native\windows_launcher.cs')
+& $csc /nologo /target:exe "/out:$root\host.exe" (Join-Path $project 'native\windows_launcher.cs')
 if ($LASTEXITCODE -ne 0) { throw 'Failed to compile the native messaging launcher.' }
 
 $settingsPath = Join-Path $root 'settings.json'
