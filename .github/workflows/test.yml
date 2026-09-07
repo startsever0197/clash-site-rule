@@ -29,5 +29,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          $framework = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319"
-          & "$framework\csc.exe" /nologo /target:exe /out:windows-host.exe native/windows_launcher.cs
+          New-Item -ItemType Directory -Path .ci-launcher | Out-Null
+          dotnet new console --framework net8.0 --force --output .ci-launcher
+          Copy-Item native/windows_launcher.cs .ci-launcher/Program.cs -Force
+          dotnet build .ci-launcher --configuration Release --no-restore
